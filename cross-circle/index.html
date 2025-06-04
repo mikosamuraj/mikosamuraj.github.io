@@ -1,0 +1,184 @@
+<html>
+    <head>
+        <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+        <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.11.1/sass.min.js"></script>
+    </head>
+
+    <div class="row-centered">
+        <div draggable="true" id='cross' value="cross" ondragstart="dragStart(event)" class="game-button cross" ></div>
+        <span class="ml-4"></span>
+        <div draggable="true" id='circle' ondragstart="dragStart(event)" class="game-button circle" ></div>
+    </div>
+
+    <div id="results-board">
+        <div id="summary-text"></div>
+    </div>
+
+<div id="root"></div>
+
+</html>
+
+<style>
+
+    .flex, .row-centered, .column, #summary-text {
+        display:flex;
+    }
+
+    .column {
+        flex-direction: column;
+    }
+
+    .row-centered, #summary-text {
+        align-items: center;
+        justify-content: center;
+    }
+
+    #results-board, #summary-text {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+    }
+
+    #results-board {
+        display: none;
+        background: rgba(213, 219, 219, 0.7);
+    }
+
+    #summary-text {
+        width: 500px;
+        height: 300px;
+        background: #82E0AA;
+        margin: auto;
+        text-align: center;
+        color: white;
+        font-size: 40px;
+    }
+
+    .game-button, .court, #summary-text {
+        border-radius: 25px;
+    }
+
+    .game-button, .court {
+        width: 200px;
+        height: 200px;
+        cursor: pointer;
+    }
+
+    .cross {
+        background: #EC7063;
+        box-shadow: 5px 5px #F5B7B1;
+        background-image: url("./cross.png");
+        background-size: 50%;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    .cross:hover {
+        opacity: 0.8;
+    }
+
+    .circle {
+        background: #82E0AA;
+        box-shadow: 5px 5px #ABEBC6;
+        background-image: url("./circle.svg");
+        background-size: 50%;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    .court {
+        background: #E5E7E9;
+        margin-top: 16px;
+    }
+
+    .ml-4 {
+        margin-left: 16px;
+    }
+</style>
+
+<script>
+    const dragStart = (ev) => {
+        ev.dataTransfer.setData("text/plain", ev.target.id);
+    }
+</script>
+
+<script type = "text/babel">
+    const CROSS = 'cross'
+    const CIRCLE = 'circle'
+
+    const checkSolution = ({ data, search, dataInc, posInc, pos = 0 }) => {
+        const subarray = [data[pos], data[pos + dataInc], data[pos + 2 * dataInc]]
+
+        if (pos < 7) {
+            if (subarray.every(e => e === search)) return search
+            else return checkSolution({ data, search, dataInc, posInc, pos: pos +posInc })
+        }
+    }
+
+    // Logic
+    const verifySolution = () => {
+        const data = Array.from(document.querySelectorAll('#game-board .flex')).map(element => {
+            return Array.from(element.childNodes).map(element => element.firstChild && element.firstChild.id) // TODO: ES6 short circuting
+        }).flat()
+
+        const rowsConfig = { data, dataInc: 1, posInc: 3 }
+        const colsConfig = { data, dataInc: 3, posInc: 1 }
+        const firstDiagConfig = { data, dataInc: 4, posInc: 4 }
+        const secondDiagConfig = { data, dataInc: 2, posInc: 2 }
+
+        const rows = checkSolution({ ...rowsConfig, search: CROSS }) || checkSolution({ ...rowsConfig, search: CIRCLE })
+        const columns = checkSolution({ ...colsConfig, search: CROSS }) || checkSolution({ ...colsConfig, search: CIRCLE })
+        const firstDiag = checkSolution({ ...firstDiagConfig, search: CROSS }) || checkSolution({ ...firstDiagConfig, search: CIRCLE })
+        const secondDiag = checkSolution({ ...secondDiagConfig, search: CROSS }) || checkSolution({ ...secondDiagConfig, search: CIRCLE })
+
+        return rows || columns || firstDiag || secondDiag
+    }
+
+    const buttonsVisibleSet = (draggable) => {
+        document.querySelector(`#${CROSS}`).setAttribute('draggable', draggable)
+        document.querySelector(`#${CIRCLE}`).setAttribute('draggable', draggable)
+    }
+
+    // Handler
+    const onDrop = async (ev) => {
+        const id = ev.dataTransfer.getData('text')
+        const element = document.querySelector(`#${id}`).cloneNode(true)
+
+        element.setAttribute('draggable', false)
+        ev.target.appendChild(element)
+
+        buttonsVisibleSet(true)
+
+        document.querySelector(`#${id}`).setAttribute('draggable', false)
+
+        const result = verifySolution()
+
+        if (result) setTimeout(() => {
+            const resultBoard = document.querySelector('#results-board')
+            const [first, ...rest] = result
+
+            resultBoard.querySelector('#summary-text').textContent = `${[first.toUpperCase(), ...rest].join('')} wins.`
+            resultBoard.style.display = 'block'
+
+            buttonsVisibleSet(false)
+        }, 500)
+    }
+
+    // Component
+    const Court = ({ x = 3, y = 3 }) => { // Props for count court
+        const gameBoard = Array.from({ length: y }).map((_, index) => {
+            return <div className="flex" key={index}>{Array.from({ length: x }).map((_, index) => {
+                return <div className="court ml-4" key={index} onDrop={onDrop} onDragOver={(e) => e.preventDefault()}/>
+            })}</div>
+        })
+
+        return <div id="game-board" className="column row-centered">{gameBoard}</div>
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'))
+    root.render(<Court />);
+</script>
