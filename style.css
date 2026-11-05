@@ -1,0 +1,76 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #1a1a2e;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+#stage {
+  position: relative;
+  width: min(100vw, calc(100vh * 144 / 256));
+  height: min(100vh, calc(100vw * 256 / 144));
+  container-type: size;
+  box-shadow: 0 0 0 4px #0f0f1a, 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+#game {
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  width: 100%;
+  height: 100%;
+}
+
+#contact {
+  display: none;
+  position: absolute;
+  left: 15.3%;
+  width: 69.4%;
+  top: 52%;
+  height: 24%;
+  pointer-events: none;
+}
+
+#contact.visible {
+  display: block;
+}
+
+#contact-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+#contact a {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 26%;
+  color: transparent;
+  font-size: 12px;
+  text-align: center;
+  pointer-events: auto;
+  user-select: text;
+  -webkit-user-select: text;
+}
