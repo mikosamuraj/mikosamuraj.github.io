@@ -28,21 +28,23 @@ function paintContact() {
   sctx.textAlign = 'center';
   sctx.textBaseline = 'middle';
 
+  const pad = Math.round(Math.max(10, w * 0.06) * scale);
+
   let size = Math.floor((h * scale) / (CONTACT_LINES.length + 1.2));
   const fit = () => {
     sctx.font = `bold ${size}px "Courier New", ui-monospace, monospace`;
   };
   fit();
   const longest = CONTACT_LINES[CONTACT_LINES.length - 1];
-  while (size > 16 && sctx.measureText(longest).width > src.width - 12) {
+  while (size > 16 && sctx.measureText(longest).width > src.width - pad * 2) {
     size -= 2;
     fit();
   }
 
-  const step = src.height / (CONTACT_LINES.length + 1);
+  const step = (src.height - pad * 2) / (CONTACT_LINES.length + 1);
   CONTACT_LINES.forEach((line, i) => {
     const x = Math.round(src.width / 2);
-    const y = Math.round(step * (i + 1));
+    const y = Math.round(pad + step * (i + 1));
     sctx.fillStyle = '#b09058';
     sctx.fillText(line, x + scale, y + scale);
     sctx.fillStyle = '#3d2418';
@@ -50,7 +52,7 @@ function paintContact() {
   });
 
   const emailW = sctx.measureText(longest).width;
-  const underlineY = Math.round(step * CONTACT_LINES.length + size * 0.55);
+  const underlineY = Math.round(pad + step * CONTACT_LINES.length + size * 0.55);
   sctx.fillStyle = '#3d2418';
   sctx.fillRect(Math.round((src.width - emailW) / 2), underlineY, Math.round(emailW), scale);
 
