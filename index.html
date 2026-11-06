@@ -4,18 +4,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Mikołaj Sojka - Software Engineer</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.min.css" />
 </head>
 <body>
   <div id="wrap">
     <div id="stage">
       <canvas id="game" width="144" height="256"></canvas>
       <div id="contact">
-        <canvas id="contact-art"></canvas>
-        <a href="mailto:mikolaj.sojka@gmail.com">mikolaj.sojka@gmail.com</a>
+        <div id="contact-art-wrap">
+          <canvas id="contact-art"></canvas>
+          <a href="mailto:mikolaj.sojka@gmail.com">mikolaj.sojka@gmail.com</a>
+        </div>
+        <div id="contact-footer">
+          <button type="button" id="play-btn" disabled aria-label="Play">
+            <canvas id="play-label" width="40" height="8"></canvas>
+          </button>
+        </div>
       </div>
     </div>
   </div>
-  <script type="module" src="js/main.js"></script>
+  <script type="module" src="game.min.js"></script>
 </body>
 </html>
